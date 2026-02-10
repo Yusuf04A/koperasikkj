@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 import {
-    Bell, User, LogOut,
-    Wallet, Send, Download, History,
-    Smartphone, Zap, Wifi, Globe,
-    CreditCard, ShieldCheck, Droplet, Tv,
-    Home, QrCode, FileText, ChevronLeft, PlusCircle, ChevronRight,
-    Gamepad2, DollarSign, Users, Gift, ArrowRight
+  Bell, User,
+  Wallet, Send, Download, History,
+  Smartphone, Zap, Wifi,
+  CreditCard, ShieldCheck, Droplet, Tv,
+  Home, QrCode, FileText, ChevronLeft, PlusCircle,
+  Gamepad2, DollarSign, Users, Gift, ArrowRight
 } from 'lucide-react'
+import BottomNav from './components/BottomNav'
+import TransaksiView from './dashboard/view/TransaksiView'
+import PembiayaanView from './dashboard/view/PembiayaanView'
+import Profile from './dashboard/view/ProfileView'
+
+
 
 // PENTING: Komponen menerima props 'session' dari App.tsx
 export default function Dashboard({ session }: { session: any }) {
@@ -225,29 +231,37 @@ export default function Dashboard({ session }: { session: any }) {
                     </div>
 
                     {/* PEMBIAYAAN PROMO */}
-                    <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-bold text-gray-800 text-sm">PEMBIAYAAN</h3>
-                            <span className="text-xs text-blue-600 cursor-pointer flex items-center gap-1">Lihat Semua <ArrowRight size={12} /></span>
-                        </div>
-                        <p className="text-xs text-gray-500 mb-4">Akses pembiayaan sesuai kebutuhan Anda</p>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-blue-50 p-3 rounded-lg flex items-center gap-3 border border-blue-100">
-                                <div className="bg-[#0e2a6d] text-white p-2 rounded"><CreditCard size={16} /></div>
-                                <div>
-                                    <p className="text-xs font-bold text-[#0e2a6d]">Kredit</p>
-                                    <p className="text-[10px] text-gray-500">Barang</p>
-                                </div>
-                            </div>
-                            <div className="bg-blue-50 p-3 rounded-lg flex items-center gap-3 border border-blue-100">
-                                <div className="bg-[#0e2a6d] text-white p-2 rounded"><Users size={16} /></div>
-                                <div>
-                                    <p className="text-xs font-bold text-[#0e2a6d]">Modal</p>
-                                    <p className="text-[10px] text-gray-500">Usaha</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                   {/* PEMBIAYAAN CARD - Pastikan ada cursor-pointer dan z-30 */}
+<div
+  className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 cursor-pointer"
+  onClick={() => {
+    console.log('PEMBIAYAAN DIKLIK')
+    setView('pembiayaan')
+  }}
+>
+  <div className="flex justify-between items-center mb-4">
+    <h3 className="font-bold text-gray-800 text-sm">PEMBIAYAAN</h3>
+    <span className="text-xs text-blue-600 flex items-center gap-1">
+      Lihat Semua <ArrowRight size={12} />
+    </span>
+  </div>
+
+  <p className="text-xs text-gray-500 mb-4">
+    Akses pembiayaan sesuai kebutuhan Anda
+  </p>
+
+  <div className="grid grid-cols-2 gap-3">
+    <div className="bg-blue-50 p-3 rounded-lg flex items-center gap-3 border">
+      <CreditCard size={16} />
+      <span className="text-xs font-bold">Kredit Barang</span>
+    </div>
+    <div className="bg-blue-50 p-3 rounded-lg flex items-center gap-3 border">
+      <Users size={16} />
+      <span className="text-xs font-bold">Modal Usaha</span>
+    </div>
+  </div>
+</div>
+
 
                 </div>
 
@@ -418,42 +432,42 @@ export default function Dashboard({ session }: { session: any }) {
     )
 
     // --- RENDER UTAMA ---
-    return (
-        <div className="min-h-screen bg-gray-50 font-sans pb-20 md:pb-0">
+   return (
+  <div className="min-h-screen bg-gray-50 font-sans pb-20 md:pb-0">
+    <div className="w-full">
+      {view === 'home' && <HomeView />}
+      {view === 'topup' && <TopUpView />}
+      {view === 'simpanan' && <SimpananView />}
+      
+      {/* Pastikan ini ada dan variabel 'view' dieja dengan benar */}
+      {view === 'pembiayaan' && (
+        <PembiayaanView
+          session={session}
+          onBack={() => setView('home')}
+        />
+      )}
 
-            {/* KONTEN UTAMA */}
-            <div className="w-full">
-                {view === 'home' && <HomeView />}
-                {view === 'topup' && <TopUpView />}
-                {view === 'simpanan' && <SimpananView />}
-            </div>
+      {view === 'transaksi' && (
+        <TransaksiView
+          session={session}
+          onBack={() => setView('home')}
+        />
+      )}
+    </div>
+    {view === 'profile' && (
 
-            {/* BOTTOM NAVIGATION (HANYA DI HP) */}
-            {view === 'home' && (
-                <div className="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 h-20 flex justify-around items-end pb-4 text-[10px] font-medium text-gray-400 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] z-50">
-                    <button className="flex flex-col items-center gap-1 w-14 text-[#0e2a6d]">
-                        <Home size={24} /> <span>Home</span>
-                    </button>
-                    <button className="flex flex-col items-center gap-1 w-14 hover:text-[#0e2a6d] transition" onClick={() => setView('topup')}>
-                        <FileText size={24} /> <span>Transaksi</span>
-                    </button>
+  <Profile
+    session={session}
+    onBack={() => setView('home')}
+  />
+)}
 
-                    {/* Tombol QRIS Tengah Menonjol */}
-                    <div className="relative -top-8 flex flex-col items-center gap-1" onClick={() => setView('topup')}>
-                        <div className="w-16 h-16 bg-[#0e2a6d] rounded-2xl shadow-xl flex items-center justify-center border-4 border-white transform active:scale-95 transition cursor-pointer">
-                            <QrCode className="text-white" size={32} />
-                        </div>
-                        <span className="text-[#0e2a6d] font-bold text-xs mt-1 bg-white px-2 rounded-full shadow-sm">QRIS</span>
-                    </div>
 
-                    <button className="flex flex-col items-center gap-1 w-14 hover:text-[#0e2a6d] transition" onClick={() => setView('simpanan')}>
-                        <History size={24} /> <span>Riwayat</span>
-                    </button>
-                    <button className="flex flex-col items-center gap-1 w-14 hover:text-[#0e2a6d] transition" onClick={() => supabase.auth.signOut()}>
-                        <User size={24} /> <span>Profil</span>
-                    </button>
-                </div>
-            )}
-        </div>
-    )
+    <BottomNav
+      active={view}
+      onChange={setView}
+    />
+  </div>
+)
+
 }
